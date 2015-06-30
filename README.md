@@ -1,4 +1,4 @@
-# Object-define
+# Object.define
 Define properties, getters, setters, and self-referencing values with a concise syntax
 
 ## Features
