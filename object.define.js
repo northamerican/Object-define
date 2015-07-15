@@ -50,44 +50,45 @@
     }
 })();
 
-
-Object.prototype.define = function(obj) {
-    if (!(this instanceof Object.prototype.define)) {
-        return new Object.prototype.define(obj);
-    }
-
-    var that = this;
-
-    this.obj = obj;
-    this.evalQueue = [];
-    this.all = {};
-    this.argTypes = function(args) {
-        return Array.prototype.slice.call(args).map(function(arg) {
-            return typeof arg;
-        });
-    };
-
-    this.attemptEval = function(name) {
-        that.evalQueue.forEach(function(method, i) {
-            try{
-                that.obj[method.name] = method.method.call(that.obj);
-                that.evalQueue.splice(i, 1);
-            } catch(e){}
-        });
-    };
-
-    // After Object.define has completed and parent function completes
-    setTimeout(function() {
-        var evalFailed;
-
-        if (that.evalQueue.length) {
-            evalFailed = that.evalQueue.map(function(method) {
-                return method.name;
-            });
-            console.error('Object.define: Could not eval ' + evalFailed.join(', '));
+Object.defineProperty(Object.prototype, 'define', {
+    value: function(obj) {
+        if (!(this instanceof Object.prototype.define)) {
+            return new Object.prototype.define(obj);
         }
-    }, 0);
-}
+
+        var that = this;
+
+        this.obj = obj;
+        this.evalQueue = [];
+        this.all = {};
+        this.argTypes = function(args) {
+            return Array.prototype.slice.call(args).map(function(arg) {
+                return typeof arg;
+            });
+        };
+
+        this.attemptEval = function(name) {
+            that.evalQueue.forEach(function(method, i) {
+                try{
+                    that.obj[method.name] = method.method.call(that.obj);
+                    that.evalQueue.splice(i, 1);
+                } catch(e){}
+            });
+        };
+
+        // After Object.define has completed and parent function completes
+        setTimeout(function() {
+            var evalFailed;
+
+            if (that.evalQueue.length) {
+                evalFailed = that.evalQueue.map(function(method) {
+                    return method.name;
+                });
+                console.error('Object.define: Could not eval ' + evalFailed.join(', '));
+            }
+        }, 0);
+    }
+});
 
 Object.defineProperties(Object.prototype.define.prototype, {
     'get': {
